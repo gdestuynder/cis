@@ -6,7 +6,6 @@ from cis.libs import validation
 utils.StructuredLogger(name=__name__, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 def run(publisher, vault_json, profile_json):
     """
     Returns True if validation succeeded, False if not (profile change will not be propagated)
@@ -15,35 +14,14 @@ def run(publisher, vault_json, profile_json):
     :profile_json: The user profile passed by the publisher
     """
 
-    # Validate only whitelisted fields for this publisher are in use
+    # The attributes we're allowed to change
     whitelist = [
-        'timezone',
-        'displayName',
-        'firstName',
-        'lastName',
-        'preferredLanguage',
-        'primaryEmail',
-        'emails',
-        'phoneNumbers',
-        'uris',
-        'nicknames',
-        'SSHFingerprints',
-        'PGPFingerprints',
-        'picture',
-        'shirtSize',
-        'groups',
-        'tags'
+        'groups'
     ]
-
-    pv = validation.ProfileValidation(publisher="mozilliansorg",
+    pv = validation.ProfileValidation(publisher="ldap",
                            current_profile=vault_json,
                            new_profile=profile_json,
                            attribute_whitelist=whitelist)
-
-    # Allows user creation by this publisher.
-    pv.permissions['CAN_CREATE_USER'] = True  # XXX TBD turn this back to false when there is another method of user provision.
-    pv.permissions['ENFORCE_ATTR_WHITELIST'] = False
-
     if not pv.verify_publisher(publisher):
         return True
 
